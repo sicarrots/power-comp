@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { DEFAULT_SETTINGS, type Settings } from '../lib/settings';
+  import { DEFAULT_SETTINGS, SMOOTHING_OPTIONS, type Settings } from '../lib/settings';
 
   let {
     settings,
@@ -45,6 +45,16 @@
     {#each FIELDS as f (f.key)}
       <label class="setting">
         <span>{f.label}</span>
+        {#if f.key === 'smoothingSec'}
+          <select value={settings.smoothingSec} onchange={(e) => onchange({ ...settings, smoothingSec: Number(e.currentTarget.value) })}>
+            {#each SMOOTHING_OPTIONS as o (o)}
+              <option value={o}>{o}</option>
+            {/each}
+            {#if !SMOOTHING_OPTIONS.includes(settings.smoothingSec)}
+              <option value={settings.smoothingSec}>{settings.smoothingSec}</option>
+            {/if}
+          </select>
+        {:else}
         <input
           type="number"
           min={f.min}
@@ -53,7 +63,11 @@
           value={settings[f.key]}
           onchange={(e) => update(f, e)}
         />
+        {/if}
       </label>
+      {#if f.key === 'minCorrelation'}
+        <p class="hint settings-hint">Alignment settings apply on the next file load or Re-run auto.</p>
+      {/if}
     {/each}
   </div>
   <button type="button" onclick={() => onchange({ ...DEFAULT_SETTINGS })}>Reset to defaults</button>

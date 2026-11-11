@@ -443,11 +443,17 @@ input {
   gap: 8px;
 }
 
-.setting input {
+.setting input,
+.setting select {
   width: 6em;
   padding: 5px 6px;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--bg);
   font-variant-numeric: tabular-nums;
+}
+
+.settings-hint {
+  grid-column: 1 / -1;
+  margin: 0;
 }

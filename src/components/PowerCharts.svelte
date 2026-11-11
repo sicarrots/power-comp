@@ -150,7 +150,7 @@
       title,
       width,
       height,
-      cursor: { sync: { key: SYNC_KEY }, drag: { x: true, y: false } },
+      cursor: { sync: { key: SYNC_KEY, scales: ['x', null] }, drag: { x: true, y: false } },
       scales: { x: { time: false } },
       axes: [
         axis({

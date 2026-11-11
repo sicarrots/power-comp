@@ -52,4 +52,28 @@ describe('analyze', () => {
     expect(a.smoothed.diffW.some((v) => v !== null)).toBe(true);
     expect(a.smoothed.diffPct.every((v) => v === null)).toBe(true);
   });
+
+  it('swapped inputs flip the lag sign and negate the difference', () => {
+    const t = toSeries(parseFit(load('zwift-wahoo.fit'), 'zwift-wahoo.fit'), S.gapFillSec);
+    const m = toSeries(parseFit(load('garmin-favero.fit'), 'garmin-favero.fit'), S.gapFillSec);
+    const fwd = autoLag(t, m, S);
+    const rev = autoLag(m, t, S);
+    expect(rev.lagSec).toBe(-fwd.lagSec);
+    const a = analyze(t, m, fwd.lagSec, S).stats!;
+    const b = analyze(m, t, rev.lagSec, S).stats!;
+    expect(a.meanDiffW).toBeGreaterThan(0);
+    expect(b.meanDiffW).toBeLessThan(0);
+    expect(b.meanDiffPct).toBeLessThan(0);
+  });
+
+  it('recovers a known lag and a 5% offset on synthetic data', () => {
+    const meterP = ridePower(3600);
+    const trainerP = meterP.map((x) => x * 1.05);
+    const trainer = makeSeries(trainerP);
+    const meter = makeSeries(meterP, 1_700_000_004); // meter clock 4 s late
+    const al = autoLag(trainer, meter, S);
+    expect(al.lagSec).toBe(-4);
+    const a = analyze(trainer, meter, al.lagSec, S);
+    expect(Math.abs(a.stats!.meanDiffPct - 5)).toBeLessThan(0.2);
+  });
 });

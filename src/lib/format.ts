@@ -1,6 +1,7 @@
 const MINUS = '−';
 
 function signed(v: number, text: string, sign: boolean): string {
+  if (v === 0) return sign ? '+' + text.replace(/^-/, '') : text.replace(/^-/, '');
   if (text.startsWith('-')) return MINUS + text.slice(1);
   return sign && v > 0 ? '+' + text : text;
 }

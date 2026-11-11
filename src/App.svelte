@@ -21,6 +21,17 @@
   let charts: PowerCharts | undefined = $state();
   let chartsEl: HTMLDivElement | undefined = $state();
 
+  // Stop stray drops outside the drop zones from navigating to / downloading the file.
+  $effect(() => {
+    const stop = (e: Event) => e.preventDefault();
+    window.addEventListener('dragover', stop);
+    window.addEventListener('drop', stop);
+    return () => {
+      window.removeEventListener('dragover', stop);
+      window.removeEventListener('drop', stop);
+    };
+  });
+
   $effect(() => saveSettings($state.snapshot(settings)));
 
   const trainerSeries: Series | null = $derived(
@@ -133,6 +144,7 @@
       stats={analysis.stats}
       overlap={analysis.overlap}
       anomalies={analysis.anomalies}
+      smoothedMeter={analysis.smoothed.meter}
       onselect={showAnomaly}
     />
   {/if}

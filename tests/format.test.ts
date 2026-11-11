@@ -17,3 +17,9 @@ test('formatDuration', () => {
 test('formatClock', () => {
   expect(formatClock(new Date(2024, 0, 1, 9, 5, 7))).toBe('09:05:07');
 });
+test('tiny negatives do not print a negative zero', () => {
+  expect(formatW(-0.04, true)).toBe('+0.0 W');
+  expect(formatW(-0.04)).toBe('0.0 W');
+  expect(formatPct(-0.03, true)).toBe('+0.0%');
+  expect(formatW(0.04, true)).toBe('+0.0 W');
+});

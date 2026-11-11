@@ -34,6 +34,7 @@ Load the smart-trainer file into the first slot and the power-meter file into th
 - `align.ts` — cross-correlation lag search and lag application
 - `overlap.ts` — longest common segment after lag, minus trim
 - `stats.ts` — differences, extremes, power-band breakdown
+- `pipeline.ts` — analyze: align, overlap, smoothing, stats and anomalies in one pass
 - `anomalies.ts` — spikes, dropouts, drift, power-dependent error, cadence mismatch
 - `settings.ts` — Settings type and defaults (all thresholds in one place)
 - `format.ts` — W / % / duration / clock-time formatting

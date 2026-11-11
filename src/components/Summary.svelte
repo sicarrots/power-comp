@@ -1,18 +1,29 @@
 <script lang="ts">
-  import type { Anomaly, Overlap, Stats } from '../lib/types';
+  import type { Anomaly, Num, Overlap, Stats } from '../lib/types';
+  import { DIFF_PCT_MIN_METER_W } from '../lib/settings';
   import { formatDuration, formatPct, formatW } from '../lib/format';
 
   let {
     stats,
     overlap,
     anomalies,
+    smoothedMeter,
     onselect,
   }: {
     stats: Stats | null;
     overlap: Overlap | null;
     anomalies: Anomaly[];
+    smoothedMeter: Num[];
     onselect: (a: Anomaly) => void;
   } = $props();
+
+  const meanPctOk = $derived(stats !== null && stats.meanMeterW >= DIFF_PCT_MIN_METER_W);
+  const posShown = $derived(stats !== null && stats.maxPos.w > 0);
+  const negShown = $derived(stats !== null && stats.maxNeg.w < 0);
+  function extremePct(e: { pct: number; t: number }): string {
+    const m = smoothedMeter[e.t];
+    return m === null || m === undefined || m < DIFF_PCT_MIN_METER_W ? '—' : formatPct(e.pct, true);
+  }
 
   const usable = $derived(stats !== null && overlap !== null && !overlap.tooShort);
 </script>
@@ -24,7 +35,7 @@
     </p>
   {:else}
     <h2 class="headline">
-      Trainer reads {formatPct(stats.meanDiffPct, true)} ({formatW(stats.meanDiffW, true)}) vs power meter over {formatDuration(
+      Trainer reads {meanPctOk ? formatPct(stats.meanDiffPct, true) : '—'} ({formatW(stats.meanDiffW, true)}) vs power meter over {formatDuration(
         stats.durationSec,
       )}
     </h2>
@@ -36,21 +47,29 @@
           <tr><th scope="row">Avg trainer</th><td>{formatW(stats.meanTrainerW)}</td></tr>
           <tr><th scope="row">Avg power meter</th><td>{formatW(stats.meanMeterW)}</td></tr>
           <tr><th scope="row">Avg difference (W)</th><td>{formatW(stats.meanDiffW, true)}</td></tr>
-          <tr><th scope="row">Avg difference (%)</th><td>{formatPct(stats.meanDiffPct, true)}</td></tr>
+          <tr><th scope="row">Avg difference (%)</th><td>{meanPctOk ? formatPct(stats.meanDiffPct, true) : '—'}</td></tr>
           <tr><th scope="row">Mean absolute difference</th><td>{formatW(stats.meanAbsDiffW)}</td></tr>
           <tr><th scope="row">Std. deviation of difference</th><td>{formatW(stats.sdDiffW)}</td></tr>
           <tr>
             <th scope="row">Max positive deviation</th>
             <td>
-              {formatW(stats.maxPos.w, true)}, {formatPct(stats.maxPos.pct, true)}
-              <span class="at">at {formatDuration(stats.maxPos.t)}</span>
+              {#if posShown}
+                {formatW(stats.maxPos.w, true)}, {extremePct(stats.maxPos)}
+                <span class="at">at {formatDuration(stats.maxPos.t)}</span>
+              {:else}
+                —
+              {/if}
             </td>
           </tr>
           <tr>
             <th scope="row">Max negative deviation</th>
             <td>
-              {formatW(stats.maxNeg.w, true)}, {formatPct(stats.maxNeg.pct, true)}
-              <span class="at">at {formatDuration(stats.maxNeg.t)}</span>
+              {#if negShown}
+                {formatW(stats.maxNeg.w, true)}, {extremePct(stats.maxNeg)}
+                <span class="at">at {formatDuration(stats.maxNeg.t)}</span>
+              {:else}
+                —
+              {/if}
             </td>
           </tr>
         </tbody>
