@@ -262,15 +262,6 @@ input {
   font-variant-numeric: tabular-nums;
 }
 
-.debug {
-  overflow-x: auto;
-  max-width: 100%;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 12px;
-}
 
 /* Charts */
 .charts {
@@ -326,4 +317,137 @@ input {
 
 .plots .u-select {
   background: rgba(127, 127, 127, 0.2);
+}
+
+/* Summary */
+.summary {
+  margin-bottom: 16px;
+  min-width: 0;
+}
+
+.summary .banner.warn {
+  margin: 0;
+}
+
+.headline {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.summary table {
+  align-self: start;
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.summary caption {
+  text-align: left;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.summary th,
+.summary td {
+  padding: 4px 8px 4px 0;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.summary tbody th {
+  font-weight: normal;
+  color: var(--muted);
+}
+
+.summary thead th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.summary .at {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.warnings-title {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+.warnings {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.warning {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: baseline;
+  text-align: left;
+}
+
+.warning.sev-warning {
+  background: var(--warn-bg);
+  border-color: var(--warn);
+}
+
+.warning.sev-warning .icon {
+  color: var(--warn);
+}
+
+.warning.sev-info .icon {
+  color: var(--meter);
+}
+
+.warning .message {
+  overflow-wrap: anywhere;
+}
+
+.warning .time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Settings */
+.settings summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 8px 16px;
+  margin: 12px 0;
+}
+
+.setting {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.setting input {
+  width: 6em;
+  padding: 5px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  font-variant-numeric: tabular-nums;
 }

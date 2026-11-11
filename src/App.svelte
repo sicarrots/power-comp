@@ -2,12 +2,14 @@
   import FileDrop from './components/FileDrop.svelte';
   import AlignControl from './components/AlignControl.svelte';
   import PowerCharts from './components/PowerCharts.svelte';
+  import Summary from './components/Summary.svelte';
+  import SettingsPanel from './components/Settings.svelte';
   import { parseFit, FitError } from './lib/fit';
   import { toSeries } from './lib/series';
   import { autoLag } from './lib/align';
   import { analyze, type Analysis } from './lib/pipeline';
   import { loadSettings, saveSettings, type Settings } from './lib/settings';
-  import type { AlignResult, ParsedFile, Series } from './lib/types';
+  import type { AlignResult, Anomaly, ParsedFile, Series } from './lib/types';
 
   let trainerFile = $state.raw<ParsedFile | null>(null);
   let meterFile = $state.raw<ParsedFile | null>(null);
@@ -16,8 +18,8 @@
   let settings: Settings = $state(loadSettings());
   let auto = $state.raw<AlignResult | null>(null);
   let lagSec = $state(0);
-  // Used by Task 12 (anomaly list → charts.zoomTo).
   let charts: PowerCharts | undefined = $state();
+  let chartsEl: HTMLDivElement | undefined = $state();
 
   $effect(() => saveSettings($state.snapshot(settings)));
 
@@ -62,6 +64,11 @@
       meterError = error;
     }
     runAuto();
+  }
+
+  function showAnomaly(a: Anomaly) {
+    charts?.zoomTo(a.from, a.to);
+    chartsEl?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function swap() {
@@ -112,15 +119,23 @@
       onrerun={runAuto}
     />
 
-    <PowerCharts
-      bind:this={charts}
-      {analysis}
-      smoothingSec={settings.smoothingSec}
-      onsmoothing={(s) => (settings.smoothingSec = s)}
-      anomalies={analysis.anomalies}
-    />
+    <div bind:this={chartsEl}>
+      <PowerCharts
+        bind:this={charts}
+        {analysis}
+        smoothingSec={settings.smoothingSec}
+        onsmoothing={(s) => (settings.smoothingSec = s)}
+        anomalies={analysis.anomalies}
+      />
+    </div>
 
-    <!-- Task 12: summary, warnings and settings panel replace this debug output. -->
-    <pre class="debug">{JSON.stringify(analysis.stats, null, 2)}</pre>
+    <Summary
+      stats={analysis.stats}
+      overlap={analysis.overlap}
+      anomalies={analysis.anomalies}
+      onselect={showAnomaly}
+    />
   {/if}
+
+  <SettingsPanel {settings} onchange={(s) => (settings = s)} />
 </main>
