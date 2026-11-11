@@ -38,3 +38,12 @@ Load the smart-trainer file into the first slot and the power-meter file into th
 - `anomalies.ts` — spikes, dropouts, drift, power-dependent error, cadence mismatch
 - `settings.ts` — Settings type and defaults (all thresholds in one place)
 - `format.ts` — W / % / duration / clock-time formatting
+
+## Deploy (Cloudflare)
+
+The app is deployed as static assets with Wrangler (`wrangler.jsonc` uploads `dist/`).
+
+- Build command: `npm run build`
+- Deploy command: `npm run deploy` (builds, then runs `wrangler deploy`)
+
+To deploy from your machine, run `npx wrangler login` once, then `npm run deploy`.
