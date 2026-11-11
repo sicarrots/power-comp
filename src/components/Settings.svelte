@@ -11,7 +11,7 @@
 
   const FIELDS: { key: keyof Settings; label: string; min: number; max?: number; step: number }[] = [
     { key: 'gapFillSec', label: 'Gap fill (s)', min: 0, step: 1 },
-    { key: 'searchWindowSec', label: 'Alignment search window (s)', min: 0, step: 1 },
+    { key: 'searchWindowSec', label: 'Alignment search window (s)', min: 1, step: 1 },
     { key: 'minCorrelation', label: 'Min. correlation (0–1)', min: 0, max: 1, step: 0.01 },
     { key: 'trimSec', label: 'Edge trim (s)', min: 0, step: 1 },
     { key: 'smoothingSec', label: 'Smoothing (s)', min: 1, step: 1 },
@@ -25,14 +25,17 @@
     { key: 'cadenceRunRpm', label: 'Cadence run threshold (rpm)', min: 0, step: 1 },
   ];
 
-  function update(key: keyof Settings, event: Event) {
+  function update(f: (typeof FIELDS)[number], event: Event) {
     const el = event.currentTarget as HTMLInputElement;
-    const v = Number(el.value);
-    if (el.value.trim() === '' || !Number.isFinite(v)) {
-      el.value = String(settings[key]);
+    const raw = Number(el.value);
+    if (el.value.trim() === '' || !Number.isFinite(raw)) {
+      el.value = String(settings[f.key]);
       return;
     }
-    onchange({ ...settings, [key]: v });
+    let v = f.step === 1 ? Math.round(raw) : raw;
+    v = Math.max(f.min, f.max === undefined ? v : Math.min(f.max, v));
+    el.value = String(v);
+    onchange({ ...settings, [f.key]: v });
   }
 </script>
 
@@ -48,10 +51,10 @@
           max={f.max}
           step={f.step}
           value={settings[f.key]}
-          onchange={(e) => update(f.key, e)}
+          onchange={(e) => update(f, e)}
         />
       </label>
     {/each}
   </div>
-  <button type="button" class="reset" onclick={() => onchange({ ...DEFAULT_SETTINGS })}>Reset to defaults</button>
+  <button type="button" onclick={() => onchange({ ...DEFAULT_SETTINGS })}>Reset to defaults</button>
 </details>
