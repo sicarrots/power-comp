@@ -1,6 +1,7 @@
 <script lang="ts">
   import FileDrop from './components/FileDrop.svelte';
   import AlignControl from './components/AlignControl.svelte';
+  import PowerCharts from './components/PowerCharts.svelte';
   import { parseFit, FitError } from './lib/fit';
   import { toSeries } from './lib/series';
   import { autoLag } from './lib/align';
@@ -15,6 +16,8 @@
   let settings: Settings = $state(loadSettings());
   let auto = $state.raw<AlignResult | null>(null);
   let lagSec = $state(0);
+  // Used by Task 12 (anomaly list → charts.zoomTo).
+  let charts: PowerCharts | undefined = $state();
 
   $effect(() => saveSettings($state.snapshot(settings)));
 
@@ -109,7 +112,13 @@
       onrerun={runAuto}
     />
 
-    <!-- Task 11: charts (power overlay, difference, scatter) go here. -->
+    <PowerCharts
+      bind:this={charts}
+      {analysis}
+      smoothingSec={settings.smoothingSec}
+      onsmoothing={(s) => (settings.smoothingSec = s)}
+      anomalies={analysis.anomalies}
+    />
 
     <!-- Task 12: summary, warnings and settings panel replace this debug output. -->
     <pre class="debug">{JSON.stringify(analysis.stats, null, 2)}</pre>

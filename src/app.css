@@ -271,3 +271,59 @@ input {
   padding: 12px;
   font-size: 12px;
 }
+
+/* Charts */
+.charts {
+  margin-bottom: 16px;
+  min-width: 0;
+}
+
+.smoothing {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.smoothing-label {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.smoothing button.active {
+  border-color: var(--meter);
+  color: var(--meter);
+  font-weight: 600;
+}
+
+.chart-hint {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.plots {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.plots .uplot {
+  font-family: inherit;
+  color: var(--fg);
+  margin-bottom: 8px;
+}
+
+.plots .u-title {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.plots .u-legend {
+  font-size: 12px;
+}
+
+.plots .u-select {
+  background: rgba(127, 127, 127, 0.2);
+}
