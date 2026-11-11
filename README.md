@@ -2,6 +2,8 @@
 
 Offline single-file browser app that compares power readings from a smart-trainer FIT file and a power-meter FIT file recorded during the same ride.
 
+**Live app:** https://power-comp.me-783.workers.dev
+
 ## Commands
 
 ```
