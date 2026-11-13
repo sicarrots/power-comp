@@ -38,7 +38,11 @@ export function computePowerCurve(a: Aligned, ov: Overlap, smoothingSec: number)
       meanDiffPct: b.m / b.n < DIFF_PCT_MIN_METER_W ? null : (b.d / b.m) * 100,
     }));
 
-  return { points, bins, fit: fitLine(points, bins) };
+  // Fit only on seconds from kept bins, so a few seconds at an unusual power (e.g. a
+  // short pedal dropout) can't tilt the line that describes the rest of the ride.
+  const kept = new Set(bins.map((b) => Math.floor(b.centerW / CURVE_BIN_W)));
+  const fitPoints = points.filter((p) => kept.has(Math.floor(p.meterW / CURVE_BIN_W)));
+  return { points, bins, fit: fitLine(fitPoints, bins) };
 }
 
 function fitLine(points: CurvePoint[], bins: CurveBin[]): CurveFit | null {

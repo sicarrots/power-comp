@@ -92,3 +92,15 @@ describe('computePowerCurve', () => {
     expect(c.fit!.maxBinDeviationAtW).toBeNull();
   });
 });
+
+describe('computePowerCurve fit uses kept bins only', () => {
+  it('a short dropout does not tilt the straight line', () => {
+    const m = ridePower(3600);
+    const t = m.map((v) => v * 1.05 + 2);
+    for (let i = 1000; i < 1020; i++) { m[i] = 0; t[i] = 120; }
+    const c = computePowerCurve(al(t, m), full(3600), 1);
+    expect(c.points.some((p) => p.meterW === 0)).toBe(true);
+    expect(Math.abs(c.fit!.interceptW - 2)).toBeLessThan(0.05);
+    expect(Math.abs(c.fit!.slope - 0.05)).toBeLessThan(5e-4);
+  });
+});

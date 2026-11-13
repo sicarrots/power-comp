@@ -2,16 +2,14 @@
   import uPlot from 'uplot';
   import 'uplot/dist/uPlot.min.css';
   import type { PowerCurve } from '../lib/types';
-  import { DIFF_PCT_MIN_METER_W } from '../lib/settings';
+  import { buildCurveChart, type CurveMode } from '../lib/curveChart';
   import { formatPct, formatW } from '../lib/format';
 
   let { curve }: { curve: PowerCurve } = $props();
 
-  type Mode = 'W' | '%';
   const HEIGHT = 260;
-  const FIT_STEP_W = 5;
 
-  let mode: Mode = $state('W');
+  let mode: CurveMode = $state('W');
   let container: HTMLDivElement | undefined = $state();
   let theme = $state(0); // bumped on prefers-color-scheme change to recreate the plot
   let plot: uPlot | null = null;
@@ -32,42 +30,6 @@
     const cs = getComputedStyle(document.documentElement);
     const v = (name: string) => cs.getPropertyValue(name).trim();
     return { fg: v('--fg'), muted: v('--muted'), border: v('--border') };
-  }
-
-  /**
-   * uPlot needs one ascending x array shared by all series, so points, bin means and
-   * the fitted line are merged onto it with nulls where a series has no value.
-   */
-  function buildData(m: Mode): uPlot.AlignedData {
-    const rows: [number, number, 0 | 1 | 2][] = [];
-    for (const p of curve.points) {
-      const y = m === 'W' ? p.diffW : p.diffPct;
-      if (y !== null) rows.push([p.meterW, y, 0]);
-    }
-    for (const b of curve.bins) {
-      const y = m === 'W' ? b.meanDiffW : b.meanDiffPct;
-      if (y !== null) rows.push([b.meanMeterW, y, 1]);
-    }
-    const f = curve.fit;
-    if (f && curve.points.length) {
-      let lo = Infinity, hi = -Infinity;
-      for (const p of curve.points) { lo = Math.min(lo, p.meterW); hi = Math.max(hi, p.meterW); }
-      if (m === 'W') {
-        rows.push([lo, f.interceptW + f.slope * lo, 2], [hi, f.interceptW + f.slope * hi, 2]);
-      } else {
-        for (let x = Math.max(lo, DIFF_PCT_MIN_METER_W); x <= hi; x += FIT_STEP_W) {
-          rows.push([x, (f.interceptW / x + f.slope) * 100, 2]);
-        }
-      }
-    }
-    rows.sort((a, b) => a[0] - b[0]);
-    const xs: number[] = [];
-    const ys: (number | null)[][] = [[], [], []];
-    for (const [x, y, s] of rows) {
-      xs.push(x);
-      for (let k = 0; k < 3; k++) ys[k].push(k === s ? y : null);
-    }
-    return [xs, ...ys];
   }
 
   function create(el: HTMLDivElement) {
@@ -94,11 +56,12 @@
       ctx.stroke();
       ctx.restore();
     };
+    const { data, yRange } = buildCurveChart(curve, mode);
     const opts: uPlot.Options = {
       width: Math.max(200, el.clientWidth),
       height: HEIGHT,
       cursor: { drag: { x: true, y: false } },
-      scales: { x: { time: false } },
+      scales: { x: { time: false }, y: { range: () => yRange } },
       axes: [
         axis({ label: 'Power meter (W)', values: (_u, s) => s.map((v) => `${v} W`) }),
         axis({ label: `Trainer − power meter (${mode})`, size: 60 }),
@@ -133,7 +96,7 @@
       ],
       hooks: { drawClear: [zeroLine] },
     };
-    plot = new uPlot(opts, buildData(mode), el);
+    plot = new uPlot(opts, data as uPlot.AlignedData, el);
   }
 
   $effect(() => {
