@@ -53,3 +53,5 @@ export function saveSettings(s: Settings, storage?: Storage | null): void {
     st?.setItem(KEY, JSON.stringify(s));
   } catch { /* ignore */ }
 }
+export const CURVE_BIN_W = 10;
+export const CURVE_MIN_BIN_SEC = 30;

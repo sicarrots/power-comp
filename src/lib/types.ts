@@ -14,3 +14,13 @@ export interface Stats {
 }
 export type AnomalyKind = 'spike' | 'dropout' | 'drift' | 'power-dependent' | 'cadence';
 export interface Anomaly { kind: AnomalyKind; severity: 'info' | 'warning'; from: number; to: number; message: string }
+
+export interface CurvePoint { meterW: number; diffW: number; diffPct: number | null }
+export interface CurveBin { centerW: number; meanMeterW: number; seconds: number; meanDiffW: number; meanDiffPct: number | null }
+export interface CurveFit {
+  interceptW: number;
+  slope: number;
+  maxBinDeviationW: number | null;
+  maxBinDeviationAtW: number | null;
+}
+export interface PowerCurve { points: CurvePoint[]; bins: CurveBin[]; fit: CurveFit | null }
