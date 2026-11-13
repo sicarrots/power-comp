@@ -1,10 +1,11 @@
-import type { Aligned, Anomaly, Num, Overlap, Series, Stats } from './types';
+import type { Aligned, Anomaly, Num, Overlap, PowerCurve, Series, Stats } from './types';
 import { DIFF_PCT_MIN_METER_W, type Settings } from './settings';
 import { applyLag, correlationAt } from './align';
 import { findOverlap } from './overlap';
 import { rollingMean } from './smooth';
 import { computeStats } from './stats';
 import { detectAnomalies } from './anomalies';
+import { computePowerCurve } from './powerCurve';
 
 export interface Analysis {
   aligned: Aligned;
@@ -13,6 +14,7 @@ export interface Analysis {
   smoothed: { trainer: Num[]; meter: Num[]; diffW: Num[]; diffPct: Num[] };
   stats: Stats | null;
   anomalies: Anomaly[];
+  curve: PowerCurve | null;
 }
 
 export function analyze(trainer: Series, meter: Series, lagSec: number, s: Settings): Analysis {
@@ -28,5 +30,6 @@ export function analyze(trainer: Series, meter: Series, lagSec: number, s: Setti
   });
   const stats = overlap && !overlap.tooShort ? computeStats(aligned, overlap, s.smoothingSec) : null;
   const anomalies = stats && overlap ? detectAnomalies(aligned, overlap, stats, s) : [];
-  return { aligned, overlap, r, smoothed: { trainer: st, meter: sm, diffW, diffPct }, stats, anomalies };
+  const curve = stats && overlap ? computePowerCurve(aligned, overlap, s.smoothingSec) : null;
+  return { aligned, overlap, r, smoothed: { trainer: st, meter: sm, diffW, diffPct }, stats, anomalies, curve };
 }

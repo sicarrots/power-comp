@@ -45,6 +45,24 @@ describe('analyze', () => {
     expect(a.anomalies).toEqual([]);
     expect(a.smoothed.trainer.length).toBe(a.aligned.trainer.length);
     expect(a.smoothed.diffW.some((v) => v !== null)).toBe(true);
+    expect(a.curve).toBeNull();
+  });
+
+  it('power curve on the example rides', () => {
+    const trainer = toSeries(parseFit(load('zwift-wahoo.fit'), 'zwift-wahoo.fit'), S.gapFillSec);
+    const meter = toSeries(parseFit(load('garmin-favero.fit'), 'garmin-favero.fit'), S.gapFillSec);
+    const lag = autoLag(trainer, meter, S).lagSec;
+    const a = analyze(trainer, meter, lag, S);
+    const c = a.curve!;
+    expect(c).not.toBeNull();
+    expect(c.bins.length).toBeGreaterThanOrEqual(10);
+    expect(c.bins[0].centerW).toBeLessThan(120);
+    expect(c.bins[c.bins.length - 1].centerW).toBeGreaterThan(220); // measured 235 W: the meter peaks at 273 W
+    expect(c.fit).not.toBeNull();
+    expect(c.points.length).toBe(a.stats!.durationSec);
+
+    const smooth30 = analyze(trainer, meter, lag, { ...S, smoothingSec: 30 }).curve!;
+    expect(smooth30.fit!.slope).not.toBe(c.fit!.slope);
   });
 
   it('diffPct is null when meter is below 20 W', () => {
