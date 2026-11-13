@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { Anomaly, Num, Overlap, Stats } from '../lib/types';
+  import type { Anomaly, Num, Overlap, PowerCurve, Stats } from '../lib/types';
+  import PowerCurveChart from './PowerCurveChart.svelte';
   import { DIFF_PCT_MIN_METER_W } from '../lib/settings';
   import { formatDuration, formatPct, formatW } from '../lib/format';
 
@@ -8,12 +9,14 @@
     overlap,
     anomalies,
     smoothedMeter,
+    curve,
     onselect,
   }: {
     stats: Stats | null;
     overlap: Overlap | null;
     anomalies: Anomaly[];
     smoothedMeter: Num[];
+    curve: PowerCurve | null;
     onselect: (a: Anomaly) => void;
   } = $props();
 
@@ -97,6 +100,10 @@
         </tbody>
       </table>
     </div>
+
+    {#if curve}
+      <PowerCurveChart {curve} />
+    {/if}
 
     <h3 class="warnings-title">Warnings</h3>
     {#if anomalies.length === 0}

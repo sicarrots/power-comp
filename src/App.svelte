@@ -145,6 +145,7 @@
       overlap={analysis.overlap}
       anomalies={analysis.anomalies}
       smoothedMeter={analysis.smoothed.meter}
+      curve={analysis.curve}
       onselect={showAnomaly}
     />
   {/if}

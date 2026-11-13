@@ -457,3 +457,38 @@ input {
   grid-column: 1 / -1;
   margin: 0;
 }
+
+.curve {
+  margin-top: 16px;
+  min-width: 0;
+}
+
+.curve-head {
+  justify-content: space-between;
+}
+
+.curve-title {
+  margin: 0;
+  font-size: 15px;
+}
+
+.curve-toggle {
+  display: flex;
+  gap: 6px;
+}
+
+.curve-toggle button.active {
+  border-color: var(--fg);
+  color: var(--fg);
+}
+
+.curve-plot {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.curve-caption {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
